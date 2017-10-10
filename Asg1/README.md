@@ -1,4 +1,4 @@
-RMSC4002  2017/18  1st term  Assignment 1
+# RMSC4002  2017/18  1st term  Assignment 1
 
 Q1. 
 The file “hkse50.csv” contains 50 names and codes of stocks list in the main board of Hong Kong Stock Exchange. 
@@ -6,9 +6,9 @@ Use the last 5 digits of your student ID as random seed and select 5 stocks rand
 For example, if the last 5 digits of your student ID is 12345,
     
         stock<-read.csv("hkse50.csv")		  # read in data
-        set.seed(12345)					          # set random seed
-        r<-sample(1:50,size=5)			      # select 5 random integers
-        stock[r,]						              # list the 5 selected stocks
+        set.seed(12345)     # set random seed
+        r<-sample(1:50,size=5)     # select 5 random integers
+        stock[r,]     # list the 5 selected stocks
             
            code            name
         37 1044    Hengan Int'l
