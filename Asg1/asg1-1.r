@@ -32,6 +32,10 @@ u4<-(lag(t4)-t4)/t4
 u5<-(lag(t5)-t5)/t5
 u<-cbind(u1, u2, u3, u4, u5) # combine into u
 
+## Having a visualation before the simulation
+matplot(ds, type='l')    # plot to see the stocks in one map
+plot(as.ts(ds))          # plot to see the stocks seperately
+
 ## Using Cholesky decompostion to generate Future Price:
 set.seed(63766)
 u60<-tail(u, 60)         # get the latest 60 days price
@@ -50,14 +54,27 @@ for(i in 1:10){          # simulate the price with future 10 days
 }
 
 ## Find min, max, mean, median, sd, lowest 1 and 5 percentile from this profit/loss distribution:
-min(v0)
-max(v0)
-mean(v0)
-median(v0)
-sd(v0)
-quantile(v0, c(.01, .05))
+print(min(v0))
+print(max(v0))
+print(mean(v0))
+print(median(v0))
+print(sd(v0))
+print(quantile(v0, c(.01, .05)))
 
 ## Plot to see the result:
 matplot(ds, type='l')    # plot to see the stocks in one map   
-plot(as.ts(ds))          # plot to see the stocks seperately    
+plot(as.ts(ds))          # plot to see the stocks seperately
 plot(as.ts(v0))          # plot to see the portfolio result
+
+## Rmk: How to Save the result by sink
+## zz <- file("asg1-1.out", open="wt")
+## sink("asg1-1.out", append=TRUE)
+## sink("asg1-1.out", append=TRUE, type="message")
+## This will echo all input and not truncate 150+ character lines,
+## source("asg1-1.r", echo=TRUE, max.deparse.length=10000)
+## Restore output to console,
+## sink() 
+## sink(type="message")
+## And look at the log...
+## file.show("test.log") # OR
+## cat(readLines("test.log"), sep="\n")
