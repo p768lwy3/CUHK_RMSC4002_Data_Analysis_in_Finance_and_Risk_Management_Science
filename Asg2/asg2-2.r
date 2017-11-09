@@ -15,21 +15,38 @@ d2 <- d[-id,]                  #testing dataset
 # (c). using d1 and glm() to fit a logistic regression of Result on the other variables.
 # lreg model,
 lreg <- glm(Result~Age+Address+Employ+Bank+House+Save, data=d1, binomial(link="logit"))
-summary(lreg)             #since ... <- how to decision to drop out? 
+summary(lreg)             #summary 
 anova(lreg, test="Chisq") #to check sig. by chisq test
-# the most important varibles: Employ, Bank, Save
 
+# to remove Age, since it's p-value is the largest
+lreg <- glm(Result~Address+Employ+Bank+House+Save, data=d1, binomial(link="logit"))
+summary(lreg)             #summary 
+anova(lreg, test="Chisq") #to check sig. by chisq test
+
+# to remove Address, since it's p-value is the largest
+lreg <- glm(Result~Employ+Bank+House+Save, data=d1, binomial(link="logit"))
+summary(lreg)             #summary 
+anova(lreg, test="Chisq") #to check sig. by chisq test
+
+# to remove House, since it's p-value is the largest and larger than 0.05
+# the most important varibles: Employ, Bank, Save
 # New lreg model,
 lreg <- glm(Result~Employ+Bank+Save, data=d1, binomial(link="logit"))
 names(lreg) #display the items in lreg
 
+# # for reference, using step() to compute the model
+# lreg <- glm(Result~., data=d1, binomial(link="logit"))
+# summary(lreg)
+# step(lreg)
+# # Result: House, Save, Employ, Bank
+
 # Produce the classifaction table for this logistic regression on d1.
-pr1  <- (lreg$fitted.values>0.5) #set pr1=True if fitted > 0.5 or otherwise
-t1   <- table(pr1, d1$Result)    #classification table of d1
-p_d1 <- t1[1,1]/sum(t1[1,])      #precision = TP/(TP+FP)
-r_d1 <- t1[1,1]/sum(t1[,1])      #recall = TP/(TP+FN)
-f1_d1 <- 2*p_d1*r_d1/(p_d1+r_d1) #F1 score
-m_d1 <- (t1[1,2]+t1[2,1])/sum(t1)#misclassification rate of d1
+pr1   <- (lreg$fitted.values>0.5) #set pr1=True if fitted > 0.5 or otherwise
+t1    <- table(pr1, d1$Result)    #classification table of d1
+p_d1  <- t1[1,1]/sum(t1[1,])      #precision = TP/(TP+FP)
+r_d1  <- t1[1,1]/sum(t1[,1])      #recall = TP/(TP+FN)
+f1_d1 <- 2*p_d1*r_d1/(p_d1+r_d1)  #F1 score
+m_d1  <- (t1[1,2]+t1[2,1])/sum(t1)#misclassification rate of d1
 
 # (d). using predict() to produce the classification table on the testing dataset d2
 pv_d2 <- predict.glm(lreg, newdata=d2) #save predicted values of d2 with lreg. 
@@ -60,4 +77,3 @@ abline(h=sum(d2$Result)/n_d2)                          #add the baseline
 yideal_d2 <- c(rep(1, sum(d2$Result)), rep(0, length(d2$Result)-sum(d2$Result))) #the ideal case
 perc_ideal_d2 <- cumsum(yideal_d2)/(1:n_d2)            #compute cumulative percentage of ideal case
 lines(perc_ideal_d2, type="l", col="brown")              #plot the ideal case in red line
-
