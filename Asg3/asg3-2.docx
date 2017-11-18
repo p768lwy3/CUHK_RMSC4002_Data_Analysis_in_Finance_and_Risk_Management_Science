@@ -1,0 +1,132 @@
+﻿
+Asg 2-2
+Course: RMSC4002
+Name: Li wai yin
+SID: 1155063766
+
+Exercise:
+(e). Compare and comment on these results obtained with the results in Question 1.
+The training error rate of ctree (classification tree) is 0.212069.
+The testing error rate of ctree is 0.245455.
+The training error rate of nn (neural network) is 0.153448.
+The testing error rate of nn is 0.263636.
+The training error rate of nn is much better than ctree, but the testing error rate is not in the same case. 
+Also, the training F1 score of nn is better than that of ctree and the testing F1 score of nn is not.
+This may show the neural network has been over fitted to the training set, so the prediction power may not be better than other simple model, like ctree. In this case, it may be better to use a less hidden units neural network to fit the data set to prevent overfitting.
+
+Code:
+> "
++ The script for RMSC4002 Asg3-2.
++ Dataset: credit.csv
++ "
+[1] "\nThe script for RMSC4002 Asg3-2.\nDataset: credit.csv\n"
+> # (0). Define functions for self-use.
+> # (i). ANN
+> library(nnet)
+> ann <- function(X, y, size, maxit=100, linout=F, try=5){     # define ann fn
++   ann1 <- nnet(y~., data=X, size=size, maxit=maxit, linout=linout)
++   v1   <- ann1$value                                         # save the result of first trial
++   for (i in 2:try){                                          # try 'try'-times
++     ann <- nnet(y~., data=X, size=size, maxit=maxit, linout=linout)
++     if (ann$value < v1){                                     # check if the current values is better
++       v1  <- ann$value                                       # save the best values
++       ann1 <- ann                                            # save the result
++     }
++   }
++   return(ann1)                                               # return the result
++ }
+> # (ii). scoring: to print error rate of classification
+> scoring <- function(table){
++     tp <- table[2,2]
++     fp <- table[1,2]
++     fn <- table[2,1]
++     precision <- tp/(tp+fp)
++     recall    <- tp/(tp+fn)
++     f1_score  <- 2*precision*recall/(precision+recall)
++     errorrate <- (table[1,2]+table[2,1])/(sum(table))
++     cat(sprintf("Error Rate = %f\n", errorrate))
++     cat(sprintf("Precision = %f\n", precision))
++     cat(sprintf("Recall = %f\n", recall))
++     cat(sprintf("F1-Score = %f\n", f1_score))
++     return(c(errorrate, precision, recall, f1_score))
++ }
+> # (a). Using the same dataset d1 and d2 in question 1 (a) as the training dataset and testing dataset. 
+> d <- read.csv('credit.csv')    #Read in credit.csv and save it in d.
+> set.seed(960430)               #Use the last six digits of your birth date as the random seed
+> id <- sample(1:690, size=580)  #randomly sample 580 records from d as the training dataset
+> d1 <- d[id,]                   #and save it in d1
+> d2 <- d[-id,]                  #Save the other records in d2 as the testing dataset
+> # Fit an improved version ann() function with size=6, linout=T, maxit=500 and try=25 and save the output to ann6.
+> ann6 <- ann(d1[, -which(names(d1) %in% c('Result'))], d1$Result,
++             size=6, linout=T, maxit=500, try=25)
+# weights:  49
+initial  value 732.920696 
+...... (skipped as there are too many)
+iter 170 value 79.399206
+final  value 79.399170 
+converged
+> ann7 <- ann(d1[, -which(names(d1) %in% c('Result'))], d1$Result,
++             size=7, linout=T, maxit=500, try=25)
+# weights:  57
+initial  value 638.133167 
+...... (skipped as there are too many)
+iter 470 value 85.618043
+final  value 85.617119 
+converged
+> ann8 <- ann(d1[, -which(names(d1) %in% c('Result'))], d1$Result,
++             size=8, linout=T, maxit=500, try=25)
+# weights:  65
+initial  value 600.362016 
+...... (skipped as there are too many)
+iter 430 value 80.002865
+final  value 80.002776 
+converged
+> ann9 <- ann(d1[, -which(names(d1) %in% c('Result'))], d1$Result,
++             size=9, linout=T, maxit=500, try=25)
+# weights:  73
+initial  value 307.031903 
+...... (skipped as there are too many)
+iter 140 value 83.630973
+final  value 83.609631 
+converged
+> # (c). Compare the final value in ann6, ann7, ann8 and ann9.
+> cat(sprintf("ann6 value = %f\n", ann6$value))
+ann6 value = 79.381917
+> cat(sprintf("ann7 value = %f\n", ann7$value))
+ann7 value = 76.609127
+> cat(sprintf("ann8 value = %f\n", ann8$value))
+ann8 value = 72.002366
+> cat(sprintf("ann9 value = %f\n", ann9$value))
+ann9 value = 65.487015
+> # Choose the best (smallest) one and produce the classification table for the training dataset d1. 
+> pr <- round(ann9$fitted.values)
+> ttrain <- table(pr, d1$Result)
+> print(ttrain)
+   
+pr    0   1
+  0 308  71
+  1  18 183
+> scoring(ttrain)
+Error Rate = 0.153448
+Precision = 0.720472
+Recall = 0.910448
+F1-Score = 0.804396
+[1] 0.1534483 0.7204724 0.9104478 0.8043956
+> prtest <- round(predict(ann9, d2))
+> ttest <- table(prtest, d2$Result)
+> print(ttest)
+      
+prtest  0  1
+     0 48 20
+     1  9 32
+     2  0  1
+> scoring(ttest)
+Error Rate = 0.263636
+Precision = 0.615385
+Recall = 0.780488
+F1-Score = 0.688172
+[1] 0.2636364 0.6153846 0.7804878 0.6881720
+
+
+
+

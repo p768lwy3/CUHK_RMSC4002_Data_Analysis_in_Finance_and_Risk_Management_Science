@@ -1,0 +1,236 @@
+﻿Asg 2-2
+Course: RMSC4002
+Name: Li wai yin
+SID: 1155063766
+
+Exercise:
+(c). Write down the classification rules from the output. Compute the confidence, support and capture for each rule.
+R1: If (Bank < 2.5) and (Employ < 1.208) then 0
+	Support=(219+48)/580=0.46, Confidence=219/(219+48)=0.82, Capture=219/326=0.67.
+R2: If (Bank < 2.5) and (Employ > 1.208) and (Save < 397) then 0
+	Support=(81+53)/580=0.23, Confidence=81/(81+53)=0.60, Capture=81/326=0.25.
+R3: If (Bank < 2.5) and (Employ > 1.208) and (Save > 397) then 1
+	Support=(5+25)/580=0.05, Confidence=25/(5+25)=0.83, Capture=25/254=0.10.
+R4: If (Bank > 2.5) and (Employ < 0.105) then 0
+	Support=(8+4)/580=0.02, Confidence=8/(8+4)=0.67, Capture=8/326=0.02.
+R5: If (Bank > 2.5) and (Employ > 0.105) then 1
+	Support=(13+124)/580=0.24, Confidence=124/(13+124)=0.98, Capture=124/254=0.49.
+
+Code:
+> "
++ The script for RMSC4002 Asg3-1.
++ Dataset: credit.csv
++ "
+[1] "\nThe script for RMSC4002 Asg3-1.\nDataset: credit.csv\n"
+> # (0). Define functions for self-use.
+> # (i). scoring: to print error rate of classification
+> scoring <- function(table){
++     tp <- table[2,2]
++     fp <- table[1,2]
++     fn <- table[2,1]
++     precision <- tp/(tp+fp)
++     recall    <- tp/(tp+fn)
++     f1_score  <- 2*precision*recall/(precision+recall)
++     errorrate <- (table[1,2]+table[2,1])/(sum(table))
++     cat(sprintf("Error Rate = %f\n", errorrate))
++     cat(sprintf("Precision = %f\n", precision))
++     cat(sprintf("Recall = %f\n", recall))
++     cat(sprintf("F1-Score = %f\n", f1_score))
++     return(c(errorrate, precision, recall, f1_score))
++ }
+> # (a). Read in credit.csv and save it in d.
+> d <- read.csv('credit.csv')
+> str(d)
+'data.frame':   690 obs. of  7 variables:
+ $ Age    : num  30.8 58.7 24.5 27.8 20.2 ...
+ $ Address: num  0 4.46 0.5 1.54 5.62 ...
+ $ Employ : num  1.25 3.04 1.5 3.75 1.71 ...
+ $ Bank   : int  1 6 0 5 0 0 0 0 0 0 ...
+ $ House  : int  202 43 280 100 120 360 164 80 180 52 ...
+ $ Save   : int  0 560 824 3 0 0 31285 1349 314 1442 ...
+ $ Result : int  1 1 1 1 1 1 1 1 1 1 ...
+> set.seed(960430)
+> id <- sample(1:690, size=580)
+> d1 <- d[id,]
+> d2 <- d[-id,]
+> # (b). Using the training dataset d1, build a classification tree of Result with other variables.
+> library(rpart)
+> ?rpart
+> ?rpart.control
+> ctree <- rpart(Result~Age+Address+Employ+Bank+House+Save+Result, 
++                data=d1, method='class', maxdepth=3)
+Warning messages:
+1: In model.matrix.default(attr(frame, "terms"), frame) :
+  the response appeared on the right-hand side and was dropped
+2: In model.matrix.default(attr(frame, "terms"), frame) :
+  problem with term 7 in model.matrix: no columns are assigned
+3: In cats * (!isord) :
+  longer object length is not a multiple of shorter object length
+> print(ctree)
+n= 580 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 580 254 0 (0.56206897 0.43793103)  
+   2) Bank< 2.5 431 126 0 (0.70765661 0.29234339)  
+     4) Employ< 1.2075 267  48 0 (0.82022472 0.17977528) *
+     5) Employ>=1.2075 164  78 0 (0.52439024 0.47560976)  
+      10) Save< 397 134  53 0 (0.60447761 0.39552239) *
+      11) Save>=397 30   5 1 (0.16666667 0.83333333) *
+   3) Bank>=2.5 149  21 1 (0.14093960 0.85906040)  
+     6) Employ< 0.105 12   4 0 (0.66666667 0.33333333) *
+     7) Employ>=0.105 137  13 1 (0.09489051 0.90510949) *
+> summary(ctree)
+Call:
+rpart(formula = Result ~ Age + Address + Employ + Bank + House + 
+    Save + Result, data = d1, method = "class", maxdepth = 3)
+  n= 580 
+
+          CP nsplit rel error    xerror       xstd
+1 0.42125984      0 1.0000000 1.0000000 0.04704115
+2 0.03937008      1 0.5787402 0.5787402 0.04124344
+3 0.01574803      3 0.5000000 0.5157480 0.03964707
+4 0.01000000      4 0.4842520 0.5275591 0.03996429
+
+Variable importance
+   Bank  Employ    Save     Age Address   House 
+     56      22      15       3       3       1 
+
+Node number 1: 580 observations,    complexity param=0.4212598
+  predicted class=0  expected loss=0.437931  P(node) =1
+    class counts:   326   254
+   probabilities: 0.562 0.438 
+  left son=2 (431 obs) right son=3 (149 obs)
+  Primary splits:
+      Bank    < 2.5     to the left,  improve=71.12103, (0 missing)
+      Employ  < 1.02    to the left,  improve=47.78555, (0 missing)
+      Save    < 538.5   to the left,  improve=43.12474, (0 missing)
+      Address < 4.02    to the left,  improve=21.34262, (0 missing)
+      House   < 99.5    to the right, improve=14.63697, (0 missing)
+  Surrogate splits:
+      Save    < 538.5   to the left,  agree=0.776, adj=0.128, (0 split)
+      Employ  < 13.9375 to the left,  agree=0.757, adj=0.054, (0 split)
+      Address < 13.8325 to the left,  agree=0.753, adj=0.040, (0 split)
+      Age     < 52.46   to the left,  agree=0.750, adj=0.027, (0 split)
+
+Node number 2: 431 observations,    complexity param=0.03937008
+  predicted class=0  expected loss=0.2923434  P(node) =0.7431034
+    class counts:   305   126
+   probabilities: 0.708 0.292 
+  left son=4 (267 obs) right son=5 (164 obs)
+  Primary splits:
+      Employ  < 1.2075  to the left,  improve=17.783020, (0 missing)
+      Save    < 492     to the left,  improve=10.729060, (0 missing)
+      Bank    < 0.5     to the left,  improve= 8.972073, (0 missing)
+      Address < 4.1875  to the left,  improve= 6.708838, (0 missing)
+      House   < 111     to the right, improve= 4.335169, (0 missing)
+  Surrogate splits:
+      House   < 394     to the left,  agree=0.640, adj=0.055, (0 split)
+      Age     < 41.665  to the left,  agree=0.633, adj=0.037, (0 split)
+      Address < 11.7925 to the left,  agree=0.631, adj=0.030, (0 split)
+      Bank    < 0.5     to the left,  agree=0.631, adj=0.030, (0 split)
+      Save    < 6930    to the left,  agree=0.631, adj=0.030, (0 split)
+
+Node number 3: 149 observations,    complexity param=0.01574803
+  predicted class=1  expected loss=0.1409396  P(node) =0.2568966
+    class counts:    21   128
+   probabilities: 0.141 0.859 
+  left son=6 (12 obs) right son=7 (137 obs)
+  Primary splits:
+      Employ  < 0.105   to the left,  improve=7.214357, (0 missing)
+      Address < 1.355   to the left,  improve=4.743741, (0 missing)
+      Save    < 227.5   to the left,  improve=3.770934, (0 missing)
+      Age     < 24.625  to the left,  improve=2.103847, (0 missing)
+      House   < 125     to the right, improve=1.502276, (0 missing)
+  Surrogate splits:
+      Age < 64.625  to the right, agree=0.933, adj=0.167, (0 split)
+
+Node number 4: 267 observations
+  predicted class=0  expected loss=0.1797753  P(node) =0.4603448
+    class counts:   219    48
+   probabilities: 0.820 0.180 
+
+Node number 5: 164 observations,    complexity param=0.03937008
+  predicted class=0  expected loss=0.4756098  P(node) =0.2827586
+    class counts:    86    78
+   probabilities: 0.524 0.476 
+  left son=10 (134 obs) right son=11 (30 obs)
+  Primary splits:
+      Save    < 397     to the left,  improve=9.396918, (0 missing)
+      Bank    < 0.5     to the left,  improve=4.891194, (0 missing)
+      Address < 4.125   to the left,  improve=4.697279, (0 missing)
+      House   < 170     to the right, improve=3.875242, (0 missing)
+      Age     < 24.54   to the right, improve=3.107908, (0 missing)
+  Surrogate splits:
+      House < 483.5   to the left,  agree=0.829, adj=0.067, (0 split)
+
+Node number 6: 12 observations
+  predicted class=0  expected loss=0.3333333  P(node) =0.02068966
+    class counts:     8     4
+   probabilities: 0.667 0.333 
+
+Node number 7: 137 observations
+  predicted class=1  expected loss=0.09489051  P(node) =0.2362069
+    class counts:    13   124
+   probabilities: 0.095 0.905 
+
+Node number 10: 134 observations
+  predicted class=0  expected loss=0.3955224  P(node) =0.2310345
+    class counts:    81    53
+   probabilities: 0.604 0.396 
+
+Node number 11: 30 observations
+  predicted class=1  expected loss=0.1666667  P(node) =0.05172414
+    class counts:     5    25
+   probabilities: 0.167 0.833 
+> # (d). Produce the classification table and compute the training error rate.
+> plot(ctree)
+> text(ctree, use.n=T, cex=0.6)
+> print(ctree)
+n= 580 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 580 254 0 (0.56206897 0.43793103)  
+   2) Bank< 2.5 431 126 0 (0.70765661 0.29234339)  
+     4) Employ< 1.2075 267  48 0 (0.82022472 0.17977528) *
+     5) Employ>=1.2075 164  78 0 (0.52439024 0.47560976)  
+      10) Save< 397 134  53 0 (0.60447761 0.39552239) *
+      11) Save>=397 30   5 1 (0.16666667 0.83333333) *
+   3) Bank>=2.5 149  21 1 (0.14093960 0.85906040)  
+     6) Employ< 0.105 12   4 0 (0.66666667 0.33333333) *
+     7) Employ>=0.105 137  13 1 (0.09489051 0.90510949) *
+> pr <- predict(ctree)
+> cl <- max.col(pr) - 1
+> ttrain <- table(cl, d1$Result)
+> print(ttrain)
+   
+cl    0   1
+  0 308 105
+  1  18 149
+> scoring(ttrain)
+Error Rate = 0.212069
+Precision = 0.586614
+Recall = 0.892216
+F1-Score = 0.707838
+[1] 0.2120690 0.5866142 0.8922156 0.7078385
+> # (e) Apply the classification rules in (d) using the testing dataset d2 
+> #     and produce the corresponding classification table. 
+> #     Compute the testing error rate.
+> prtest <- predict(ctree, d2) 
+> cltest <- max.col(prtest) - 1
+> ttest  <- table(cltest, d2$Result)
+> print(ttest)  
+      
+cltest  0  1
+     0 54 24
+     1  3 29
+> scoring(ttest)
+Error Rate = 0.245455
+Precision = 0.547170
+Recall = 0.906250
+F1-Score = 0.682353
+[1] 0.2454545 0.5471698 0.9062500 0.6823529
+
