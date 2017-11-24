@@ -1,13 +1,12 @@
 """
   Python 3 script for Group Asg of FINA4380.
-  The Script used kalman filter with EM-algo.
-
-  https://www.quantopian.com/posts/quantcon-2016-using-the-kalman-filter-in-algorithmic-trading
-  https://www.quantstart.com/articles/Backtesting-An-Intraday-Mean-Reversion-Pairs-Strategy-Between-SPY-And-IWM
+  The Script does following:
+    1. used Kalman Filter with EM algorithm method to compute beta.
+    2. by the concept mean-reseversion, long an asset X and short another one y with ratio beta to do pair trading.
+  In this asg, Cryptocurrency Bitcoin, Ethereum and Litecoin had been considered.
 """
 
 # Import:
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pykalman import KalmanFilter
@@ -35,9 +34,6 @@ def read_data(symbols=symbols):
   return pairs
 
 def calculate_spread_zscore(pairs, symbols=symbols, window=100, EM_algo=True):
-  # using pandas OLS method to fit a rolling LinReg btw pairs
-  # to create a hedge ratio btw pairs and then used to create a z-score of the 'spread' btw two symbols based on linreg combination of two.
-
   sym1 = '{0}_close'.format(symbols[0])
   sym2 = '{0}_close'.format(symbols[1])
   print('  Computing Betas by Kalmen Filter...')
@@ -51,25 +47,17 @@ def calculate_spread_zscore(pairs, symbols=symbols, window=100, EM_algo=True):
                     transition_covariance=0.01**2 * np.eye(2))
   if EM_algo == True:
     kf = kf.em(pairs[sym1].values, n_iter=5)
-
   means, covs = kf.filter(pairs[sym1].values)
 
   pairs['hedge_ratio'] = means[:,0]
   pairs['hedge_alpha'] = means[:,1]
   pairs = pairs.dropna()
-
   pairs['spread'] = pairs[sym1] - pairs['hedge_ratio'] * pairs[sym2] - pairs['hedge_alpha']
   pairs['zscore'] = (pairs['spread'] - np.mean(pairs['spread'])) / np.std(pairs['spread'])
   print('  Finished computing Beta and Now is computing Spread and Z Score...')
   return pairs
 
-def create_long_short_market_signals(pairs,
-                                     z_entry_threshold=2.0, 
-                                     z_exit_threshold=1.0):
-    """Create the entry/exit signals based on the exceeding of 
-    z_enter_threshold for entering a position and falling below
-    z_exit_threshold for exiting a position."""
-
+def create_long_short_market_signals(pairs, z_entry_threshold=2.0,  z_exit_threshold=1.0):
     # Calculate when to be long, short and when to exit
     pairs['longs'] = (pairs['zscore'] <= -z_entry_threshold)*1.0
     pairs['shorts'] = (pairs['zscore'] >= z_entry_threshold)*1.0
@@ -115,10 +103,6 @@ def create_long_short_market_signals(pairs,
     return pairs
 
 def create_portfolio_returns(pairs, symbols=symbols):
-    """Creates a portfolio pandas DataFrame which keeps track of
-    the account equity and ultimately generates an equity curve.
-    This can be used to generate drawdown and risk/reward ratios."""
-
     # Construct the portfolio object with positions information
     # Note that minuses to keep track of shorts!
     sym1 = '{0}_close'.format(symbols[0])
@@ -142,10 +126,4 @@ def create_portfolio_returns(pairs, symbols=symbols):
     # Calculate the full equity curve
     portfolio['returns'] = (portfolio['returns'] + 1.0).cumprod()
     return portfolio
-  
-def main():
-  pass
-  
-if __name__ == '__main__':
-  main()
   
