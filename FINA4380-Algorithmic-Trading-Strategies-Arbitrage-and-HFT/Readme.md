@@ -9,3 +9,9 @@
     3) computer code (R, matlab, mathematica, etc) underlying the trading strategy!
        (training data: optimisation routine; test data: strategy performance)!
     4) performance & risk report
+
+## Dataset from:
+[1]. volking0@gmail.com. [Crypto Currency Datasets](http://www.cryptodatasets.com/)
+
+## Reference:
+[1]. Yuxing Chen, Weiluo Ren and Xiaoxiong Lu. [Machine Learning in Pairs Trading Strategies](http://cs229.stanford.edu/proj2012/ChenRenLu-MachineLearningInPairsTradingStrategies.pdf) </br>
