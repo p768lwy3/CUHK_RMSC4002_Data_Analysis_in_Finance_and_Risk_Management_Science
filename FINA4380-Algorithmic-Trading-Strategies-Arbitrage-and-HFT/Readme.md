@@ -14,4 +14,6 @@
 [1]. volking0@gmail.com. [Crypto Currency Datasets](http://www.cryptodatasets.com/)
 
 ## Reference:
-[1]. Yuxing Chen, Weiluo Ren and Xiaoxiong Lu. [Machine Learning in Pairs Trading Strategies](http://cs229.stanford.edu/proj2012/ChenRenLu-MachineLearningInPairsTradingStrategies.pdf) </br>
+[1]. Aidan O'Mahony. [QuantCon 2016: Using the Kalman Filter in Algorithmic Trading](https://www.quantopian.com/posts/quantcon-2016-using-the-kalman-filter-in-algorithmic-trading)</br>
+[2]. Michael Halls-Moore. [Backtesting An Intraday Mean Reversion Pairs Strategy Between SPY And IWM](https://www.quantstart.com/articles/Backtesting-An-Intraday-Mean-Reversion-Pairs-Strategy-Between-SPY-And-IWM)</br>
+[3]. Yuxing Chen, Weiluo Ren and Xiaoxiong Lu. [Machine Learning in Pairs Trading Strategies](http://cs229.stanford.edu/proj2012/ChenRenLu-MachineLearningInPairsTradingStrategies.pdf)</br>
