@@ -7,11 +7,8 @@
 """
 
 # Import:
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pykalman import KalmanFilter
-import statsmodels.api as sm
 
 symbols = ['ltc', 'btc'] # 'eth', 'btc', 'lte'
 
