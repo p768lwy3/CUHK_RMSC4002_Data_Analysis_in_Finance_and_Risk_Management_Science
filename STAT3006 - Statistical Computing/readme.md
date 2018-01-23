@@ -1,4 +1,4 @@
-# STAT3006 Statistical computing
+# STAT3006 - Statistical Computing
 ## Asg1 contains:
 ```
 1. bisection method to compute zero points
