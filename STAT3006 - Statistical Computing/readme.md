@@ -11,4 +11,11 @@ and the assignments is writen in R. </br>
 ```
 ## Asg2 contains:
 ```
+1. Inverse method to generate samples from Poisson distribution.
+2. Accept-Reject method to generate samples from Truncated normal distribution.
+3. MCMC integration without / with importance sampling.
+4. Stratified sampling to estimate mean of dataset
+```
+## Asg3 contains:
+```
 ```
