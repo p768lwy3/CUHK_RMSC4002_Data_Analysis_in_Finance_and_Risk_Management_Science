@@ -18,4 +18,7 @@ and the assignments is writen in R. </br>
 ```
 ## Asg3 contains:
 ```
+1. Gibbs sampler to find the changing point of Poisson distribution.
+2. Hybrid Gibbs sampler / MH Gibbs sampler to estimation the lambda of Poisson distribution.
+3. Clustering Bivariative Normal distributed data with Gibbs sampler.
 ```
